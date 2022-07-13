@@ -24,12 +24,19 @@
     "@devexpress/dx-react-scheduler": "^3.0.3",
     "@devexpress/dx-react-scheduler-material-ui": "^3.0.3",
     "@hot-loader/react-dom": "^17.0.1",
+    "@shopify/shopify-api": "^4.0.0",
+    "axios": "^0.27.2",
+    "body-parser": "^1.20.0",
+    "cookie-parser": "^1.4.6",
     "dotenv": "^10.0.0",
     "express": "^4.17.2",
     "moment": "^2.29.4",
+    "mongoose": "^6.4.4",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "react-hot-loader": "^4.13.0"
+    "react-hot-loader": "^4.13.0",
+    "react-router-dom": "^6.3.0",
+    "recharts": "^2.1.12"
   },
   "devDependencies": {
     "@babel/core": "^7.16.5",

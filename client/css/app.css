@@ -114,10 +114,8 @@ button.rbc-input::-moz-focus-inner {
   height: 100%;
   overflow-y: scroll;
   /* Hide scrollbar for Chrome, Safari and Opera */
-  -ms-overflow-style: none;
-  /* IE and Edge */
-  scrollbar-width: none;
-  /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }
 .rbc-row-content-scrollable .rbc-row-content-scroll-container::-webkit-scrollbar {
   display: none;
@@ -730,4 +728,9 @@ button.rbc-input::-moz-focus-inner {
 
 .cal-container {
   height: 80vh;
+}
+
+a, a:link, a:visited {
+  text-decoration: none;
+  color: unset;
 }/*# sourceMappingURL=app.css.map */

@@ -15,6 +15,7 @@ import InventoryIcon from "@mui/icons-material/Inventory";
 import SettingsIcon from "@mui/icons-material/Settings";
 import SellIcon from "@mui/icons-material/Sell";
 import DashboardIcon from "@mui/icons-material/Dashboard";
+import { Link } from "react-router-dom";
 
 export default function MenuDrawer(props) {
   const state = props.state;
@@ -38,18 +39,20 @@ export default function MenuDrawer(props) {
     >
       <List>
         {routes.map((text, index) => (
-          <ListItem key={text} disablePadding>
-            <ListItemButton>
-              <ListItemIcon>
-                {text === routes[0] ? <DashboardIcon /> : ""}
-                {text === routes[1] ? <CalendarMonthIcon /> : ""}
-                {text === routes[2] ? <PermContactCalendarIcon /> : ""}
-                {text === routes[3] ? <ScheduleIcon /> : ""}
-                {text === routes[4] ? <InventoryIcon /> : ""}
-              </ListItemIcon>
-              <ListItemText primary={text} />
-            </ListItemButton>
-          </ListItem>
+          <Link to={"/" + text}>
+            <ListItem key={text} disablePadding>
+              <ListItemButton>
+                <ListItemIcon>
+                  {text === routes[0] ? <DashboardIcon /> : ""}
+                  {text === routes[1] ? <CalendarMonthIcon /> : ""}
+                  {text === routes[2] ? <PermContactCalendarIcon /> : ""}
+                  {text === routes[3] ? <ScheduleIcon /> : ""}
+                  {text === routes[4] ? <InventoryIcon /> : ""}
+                </ListItemIcon>
+                <ListItemText primary={text} />
+              </ListItemButton>
+            </ListItem>
+          </Link>
         ))}
       </List>
       <Divider />

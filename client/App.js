@@ -1,43 +1,21 @@
 import { hot } from "react-hot-loader/root";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
 import "./css/app.css";
 import data from "../server/productData";
 import Paper from "@mui/material/Paper";
 import MenuAppBar from "./components/MenuAppBar";
-import MenuDrawer from "./components/Drawer";
-import Grid from "@mui/material/Grid";
-import PersonIcon from "@mui/icons-material/Person";
-import { styled } from "@mui/material/styles";
-import SellIcon from "@mui/icons-material/Sell";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemText from "@mui/material/ListItemText";
-import Divider from "@mui/material/Divider";
-import classNames from "clsx";
+import { Routes, Route, Link } from "react-router-dom";
+import Appointment from "./components/routes/Appointment";
+import Dashboard from "./components/routes/Dashboard";
+import Services from "./components/routes/Services";
+import Settings from "./components/routes/Settings";
+import Availability from "./components/routes/Availability";
+import Plans from "./components/routes/Plans";
+import Resources from "./components/routes/Resources";
+import axios from "axios";
 
-import {
-  ViewState,
-  EditingState,
-  IntegratedEditing,
-} from "@devexpress/dx-react-scheduler";
-import {
-  Scheduler,
-  DayView,
-  Appointments,
-  ViewSwitcher,
-  MonthView,
-  DateNavigator,
-  TodayButton,
-  Toolbar,
-  WeekView,
-  AppointmentTooltip,
-  AppointmentForm,
-} from "@devexpress/dx-react-scheduler-material-ui";
-
-const currentDate = "2022-11-01";
-const schedulerData = data;
 // const schedulerData = data.map((data) => {
 //   return {
 //     startDate: data.startDate,
@@ -46,137 +24,92 @@ const schedulerData = data;
 //     id: data.id,
 //   };
 // });
-console.log(schedulerData);
 
-const localizer = momentLocalizer(moment);
-
+// const localizer = momentLocalizer(moment);
 //https://devexpress.github.io/devextreme-reactive/react/scheduler/docs/guides/getting-started/
 
 const App = () => {
+  const date = moment().format().split("T");
+
+  const schedulerData = data;
+  const currentDate = date[0];
+  const [getPageTitle, setPageTitle] = useState();
   const [getData, setData] = useState({
     data: schedulerData,
-    currentDate: "2022-10-01",
+    currentDate: currentDate,
   });
 
-  function commitChanges({ added, changed, deleted }) {
-    setData((state) => {
-      let { data } = state;
-      if (added) {
-        const startingAddedId =
-          data.length > 0 ? data[data.length - 1].id + 1 : 0;
-        data = [...data, { id: startingAddedId, ...added }];
+  useEffect(() => {
+    axios
+      .get("/appointments/all")
+      .then((res) => setAppointmentData(res.data))
+      .then((data) => console.log(data, getData));
+  }, []);
+
+  function setAppointmentData(data) {
+    console.log(data.data[1].customer.email);
+    const newArr = data.data.map((booking) => {
+      if (booking.customer) {
+        return {
+          startDate: booking.startDate,
+          endDate: booking.endDate,
+          email: booking.customer.email || "",
+          first_name: booking.customer.first_name,
+          last_name: booking.customer.last_name,
+          phone_number: booking.customer.phone_number,
+          services: booking.services,
+          title: "Consultation",
+        };
+      } else {
+        return {
+          startDate: booking.startDate,
+          endDate: booking.endDate,
+          services: booking.services,
+          title: "Consultation",
+        };
       }
-      if (changed) {
-        data = data.map((appointment) =>
-          changed[appointment.id]
-            ? { ...appointment, ...changed[appointment.id] }
-            : appointment
-        );
-      }
-      if (deleted !== undefined) {
-        data = data.filter((appointment) => appointment.id !== deleted);
-      }
-      return { data };
     });
+    setData({ data: newArr, currentDate: currentDate });
   }
-
-  const PREFIX = "Demo";
-
-  const classes = {
-    icon: `${PREFIX}-icon`,
-    textCenter: `${PREFIX}-textCenter`,
-    // firstRoom: `${PREFIX}-firstRoom`,
-    // secondRoom: `${PREFIX}-secondRoom`,
-    // thirdRoom: `${PREFIX}-thirdRoom`,
-    header: `${PREFIX}-header`,
-    commandButton: `${PREFIX}-commandButton`,
-  };
-
-  const StyledGrid = styled(Grid)(() => ({
-    [`&.${classes.textCenter}`]: {
-      textAlign: "center",
-      alignSelf: "start",
-    },
-  }));
-
-  const StyledGridServices = styled(Grid)(() => ({
-    [`&.${classes.textCenter}`]: {
-      textAlign: "center",
-      alignSelf: "start",
-      marginTop: 3,
-    },
-  }));
-
-  const StyledPerson = styled(PersonIcon)(({ theme: { palette } }) => ({
-    [`&.${classes.icon}`]: {
-      color: palette.action.active,
-    },
-  }));
-
-  const StyledSellIcon = styled(SellIcon)(({ theme: { palette } }) => ({
-    [`&.${classes.icon}`]: {
-      color: palette.action.active,
-    },
-  }));
-
-  const Content = ({ children, appointmentData, ...restProps }) => (
-    <AppointmentTooltip.Content
-      {...restProps}
-      appointmentData={appointmentData}
-    >
-      <Grid container alignItems="center">
-        <StyledGrid item xs={2} className={classes.textCenter}>
-          <StyledPerson className={classes.icon} />
-        </StyledGrid>
-        <Grid item xs={10}>
-          <span>
-            {appointmentData.first_name + " " + appointmentData.last_name}
-          </span>
-        </Grid>
-        <StyledGridServices item xs={2} className={classes.textCenter}>
-          <StyledSellIcon className={classes.icon} />
-        </StyledGridServices>
-        <Grid item xs={10}>
-          <List>
-            {appointmentData.services.map((data) => {
-              return (
-                <>
-                  <ListItem disablePadding disableGutters>
-                    <ListItemText primary={data.name} />
-                  </ListItem>
-                  <Divider />
-                </>
-              );
-            })}
-          </List>
-        </Grid>
-      </Grid>
-    </AppointmentTooltip.Content>
-  );
 
   return (
     <Paper>
-      <MenuAppBar />
-
-      <Scheduler data={schedulerData}>
-        <ViewState defaultCurrentDate={getData.currentDate} />
-        <EditingState onCommitChanges={commitChanges} />
-        <IntegratedEditing />
-        <DayView startDayHour={9} endDayHour={14} />
-        <WeekView startDayHour={10} endDayHour={19} />
-        <MonthView />
-        <Toolbar />
-        <ViewSwitcher />
-        <DateNavigator />
-        <TodayButton />
-        <Appointments />
-        <AppointmentTooltip
-          showCloseButton
-          showOpenButton
-          contentComponent={Content}
+      <MenuAppBar setPageTitle={setPageTitle} getPageTitle={getPageTitle} />
+      <Routes>
+        <Route
+          path=""
+          element={<Dashboard currentDate={currentDate} getData={getData} />}
         />
-        <AppointmentForm />
-      </Scheduler>
+        <Route
+          path="/"
+          element={
+            <Appointment
+              currentDate={currentDate}
+              getData={getData}
+              setData={setData}
+            />
+          }
+        />
+        <Route
+          path="appointments"
+          element={
+            <Appointment
+              currentDate={currentDate}
+              getData={getData}
+              setData={setData}
+            />
+          }
+        />
+        <Route
+          path="dashboard"
+          element={<Dashboard currentDate={currentDate} getData={getData} />}
+        />
+        <Route path="availability" element={<Availability />} />
+        <Route path="plans" element={<Plans />} />
+        <Route path="resources" element={<Resources />} />
+        <Route path="services" element={<Services />} />
+        <Route path="settings" element={<Settings />} />
+      </Routes>
     </Paper>
   );
 };

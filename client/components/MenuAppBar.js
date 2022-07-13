@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useState, useEffect } from "react";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
@@ -13,12 +14,24 @@ import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
 import MenuDrawer from "./Drawer";
 
-export default function MenuAppBar() {
+export default function MenuAppBar(props) {
   const [auth, setAuth] = React.useState(true);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [state, setState] = React.useState({
     right: false,
   });
+
+  const setPageTitle = props.setPageTitle;
+  const pageTitle = props.getPageTitle;
+
+  useEffect(() => {
+    const pagePath = window.location.pathname.split("/");
+    const pageTitle =
+      pagePath[1][0].toUpperCase() + pagePath[1].slice(1, pagePath[1].length);
+    setPageTitle((title) => pageTitle);
+  }, [pageTitle]);
+
+  console.log(pageTitle);
   const anchor = "left";
 
   const handleChange = (event) => {
@@ -78,7 +91,7 @@ export default function MenuAppBar() {
           <MenuDrawer toggleDrawer={toggleDrawer} state={state} />
 
           <Typography variant="h6" component="div" sx={{ flexGrow: 1, ml: 2 }}>
-            Page Title
+            {pageTitle}
           </Typography>
           {auth && (
             <div>
