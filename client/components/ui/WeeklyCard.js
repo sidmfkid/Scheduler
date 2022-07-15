@@ -9,7 +9,9 @@ import WeeklyChart from "./WeeklyChart";
 import NavigateBefore from "@mui/icons-material/NavigateBefore";
 import NavigateNext from "@mui/icons-material/NavigateNext";
 import CardHeader from "@mui/material/CardHeader";
-import Box from "@mui/material/Box";
+import { Box, IconButton } from "@mui/material/";
+import { createTheme, ThemeProvider, styled } from "@mui/material/styles";
+import { purple, green } from "@mui/material/colors";
 
 function WeeklyCard(props) {
   const [getWeekChartData, setWeekChartData] = useState([]);
@@ -138,31 +140,60 @@ function WeeklyCard(props) {
         ? moment(currentDate)
             .startOf("week")
             .add(getCurrentCount, "week")
-            .format("YYYY-MM-DD")
+            .format("MMMM Do, YYYY")
         : moment(currentDate)
             .startOf("week")
             .subtract(Math.abs(getCurrentCount), "week")
-            .format("YYYY-MM-DD");
+            .format("MMMM Do, YYYY");
 
     let selectedWeekEnd =
       getCurrentCount > 0
         ? moment(currentDate)
             .endOf("week")
             .add(getCurrentCount, "week")
-            .format("YYYY-MM-DD")
+            .format("MMMM Do, YYYY")
         : moment(currentDate)
             .endOf("week")
             .subtract(Math.abs(getCurrentCount), "week")
-            .format("YYYY-MM-DD");
+            .format("MMMM Do, YYYY");
 
     let range = `${selectedWeekStart} to ${selectedWeekEnd}`;
     setCurrentRange(range);
   }
 
+  const StyledIconButton = styled(IconButton)(({ theme }) => ({
+    backgroundColor: "rgba(135, 72, 174, 0.5)",
+    boxShadow: "0px 1px 5px 0px rgba(65, 2, 104, 0.5)",
+    borderRadius: "16px",
+    color: theme.palette.getContrastText("rgba(135, 72, 174, 0.5)"),
+
+    "&:hover": {
+      backgroundColor: "#691b9985",
+      boxShadow: "0px 1px 15px -5px rgba(65, 2, 104, 0.5)",
+      borderRadius: "16px",
+
+      color: theme.palette.getContrastText("#691b9985"),
+    },
+    "&:active": {
+      backgroundColor: `${theme.palette.primary.light}`,
+      borderRadius: "16px",
+    },
+    "&:focus": {
+      boxShadow: `0 0 5px 0.1rem ${theme.palette.secondary.light}`,
+      borderRadius: "16px",
+    },
+  }));
+
   return (
     <>
       <Box>
-        <Typography variant="h6" component="div" sx={{ textAlign: "center" }}>
+        <Typography
+          color={"secondary"}
+          variant="h5"
+          fontWeight={500}
+          component="div"
+          sx={{ textAlign: "center" }}
+        >
           Weekly View
         </Typography>
       </Box>
@@ -175,32 +206,31 @@ function WeeklyCard(props) {
           flexWrap: "nowrap",
         }}
       >
-        <Button
+        <StyledIconButton
+          size="large"
           onClick={(e) => setCurrentCount((count) => (count -= 1))}
-          sx={{ display: "block" }}
-          variant="text"
         >
-          <NavigateBefore />
-        </Button>
+          <NavigateBefore fontSize="large" />
+        </StyledIconButton>
         <WeeklyChart
           chartData={getWeekChartData || chartData}
           graphDays={graphDays}
           filteredWeek={filteredWeek}
         />
 
-        <Button
+        <StyledIconButton
+          size="large"
           onClick={(e) => setCurrentCount((count) => (count += 1))}
-          variant="text"
-          sx={{ display: "block" }}
         >
-          <NavigateNext />
-        </Button>
+          <NavigateNext fontSize="large" />
+        </StyledIconButton>
       </Box>
       <Box sx={{ width: "100%", margin: "2rem 0" }}>
         <Typography
           variant="caption"
           component="div"
-          sx={{ textAlign: "center" }}
+          color={"secondary"}
+          sx={{ textAlign: "center", fontSize: "1.4rem" }}
         >
           {getCurrentRange}
         </Typography>

@@ -16,6 +16,8 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import SellIcon from "@mui/icons-material/Sell";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import { Link } from "react-router-dom";
+import { green, purple } from "@mui/material/colors";
+import { createTheme, ThemeProvider, styled } from "@mui/material/styles";
 
 export default function MenuDrawer(props) {
   const state = props.state;
@@ -29,18 +31,38 @@ export default function MenuDrawer(props) {
     "Services",
   ];
   const bottomRoutes = ["Settings", "Plan & Pricing"];
+  let theme = createTheme({
+    palette: {
+      type: "light",
+      primary: {
+        main: purple[800],
+      },
+      secondary: {
+        main: green.A400,
+      },
+    },
+    typography: {
+      color: "#fff",
+    },
+  });
+
+  const StyledBox = styled(Box)(({ theme }) => ({
+    width: "300px",
+    height: "100%",
+    background: "linear-gradient(120deg, #37006abd , #9b4dcbb3)",
+    color: theme.palette.getContrastText(theme.palette.primary.main),
+  }));
 
   const list = (anchor) => (
-    <Box
+    <StyledBox
       role="presentation"
       onClick={toggleDrawer(anchor, false)}
       onKeyDown={toggleDrawer(anchor, false)}
-      sx={{ width: 300 }}
     >
       <List>
         {routes.map((text, index) => (
-          <Link to={"/" + text}>
-            <ListItem key={text} disablePadding>
+          <Link key={text} to={"/" + text}>
+            <ListItem disablePadding>
               <ListItemButton>
                 <ListItemIcon>
                   {text === routes[0] ? <DashboardIcon /> : ""}
@@ -69,11 +91,12 @@ export default function MenuDrawer(props) {
           </ListItem>
         ))}
       </List>
-    </Box>
+    </StyledBox>
   );
 
   return (
     <Drawer
+      sx={{ background: "linear-gradient(120deg, #37006abd 60%, #9b4dcbb3)" }}
       anchor={anchor}
       open={state[anchor]}
       onClose={toggleDrawer(anchor, false)}

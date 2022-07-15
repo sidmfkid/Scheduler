@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
+import { Button, IconButton } from "@mui/material";
 import Typography from "@mui/material/Typography";
 import MonthlyChart from "./MonthlyChart";
 import NavigateBefore from "@mui/icons-material/NavigateBefore";
 import NavigateNext from "@mui/icons-material/NavigateNext";
 import moment from "moment";
+import { createTheme, ThemeProvider, styled } from "@mui/material/styles";
+import { purple, green } from "@mui/material/colors";
 
 function MonthlyCard(props) {
   const [getMonthChartData, setMonthChartData] = useState([]);
@@ -78,11 +80,54 @@ function MonthlyCard(props) {
     });
     setMonthChartData(MonthlyChartData);
   }
+  let theme = createTheme({
+    palette: {
+      type: "light",
+      primary: {
+        main: purple[800],
+      },
+      secondary: {
+        main: green.A400,
+      },
+    },
+    typography: {
+      color: "#fff",
+    },
+  });
+
+  const StyledIconButton = styled(IconButton)(({ theme }) => ({
+    backgroundColor: "rgba(135, 72, 174, 0.5)",
+    boxShadow: "0px 1px 5px 0px rgba(65, 2, 104, 0.5)",
+    borderRadius: "16px",
+    color: theme.palette.getContrastText("rgba(135, 72, 174, 0.5)"),
+
+    "&:hover": {
+      backgroundColor: "#691b9985",
+      boxShadow: "0px 1px 15px -5px rgba(65, 2, 104, 0.5)",
+      borderRadius: "16px",
+
+      color: theme.palette.getContrastText("#691b9985"),
+    },
+    "&:active": {
+      backgroundColor: `${theme.palette.primary.light}`,
+      borderRadius: "16px",
+    },
+    "&:focus": {
+      boxShadow: `0 0 5px 0.1rem ${theme.palette.secondary.light}`,
+      borderRadius: "16px",
+    },
+  }));
 
   return (
     <>
       <Box>
-        <Typography variant="h6" component="div" sx={{ textAlign: "center" }}>
+        <Typography
+          color={"secondary"}
+          variant="h5"
+          fontWeight={500}
+          component="div"
+          sx={{ textAlign: "center" }}
+        >
           Monthly View
         </Typography>
       </Box>
@@ -95,27 +140,26 @@ function MonthlyCard(props) {
           flexWrap: "nowrap",
         }}
       >
-        <Button
+        <StyledIconButton
+          size="large"
           onClick={(e) => setCurrentCount((count) => (count -= 1))}
-          sx={{ display: "block" }}
-          variant="text"
         >
-          <NavigateBefore />
-        </Button>
+          <NavigateBefore fontSize="large" />
+        </StyledIconButton>
         <MonthlyChart chartData={getMonthChartData} />
-        <Button
-          sx={{ display: "block" }}
+        <StyledIconButton
+          size="large"
           onClick={(e) => setCurrentCount((count) => (count += 1))}
-          variant="text"
         >
-          <NavigateNext />
-        </Button>
+          <NavigateNext fontSize="large" />
+        </StyledIconButton>
       </Box>
       <Box sx={{ width: "100%", margin: "2rem 0" }}>
         <Typography
+          color={"secondary"}
           variant="caption"
           component="div"
-          sx={{ textAlign: "center" }}
+          sx={{ textAlign: "center", fontSize: "1.4rem" }}
         >
           {getCurrentRange}
         </Typography>

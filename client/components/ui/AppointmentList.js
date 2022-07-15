@@ -4,57 +4,16 @@ import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
+import { TableRow, Typography } from "@mui/material";
 import Title from "./Title";
 import moment from "moment";
+import { createTheme, ThemeProvider, styled } from "@mui/material/styles";
+import { purple, green } from "@mui/material/colors";
 
 // Generate Order Data
 function createData(id, date, name, shipTo, paymentMethod, amount) {
   return { id, date, name, shipTo, paymentMethod, amount };
 }
-
-const rows = [
-  createData(
-    0,
-    "16 Mar, 2019",
-    "Elvis Presley",
-    "Tupelo, MS",
-    "VISA ⠀•••• 3719",
-    312.44
-  ),
-  createData(
-    1,
-    "16 Mar, 2019",
-    "Paul McCartney",
-    "London, UK",
-    "VISA ⠀•••• 2574",
-    866.99
-  ),
-  createData(
-    2,
-    "16 Mar, 2019",
-    "Tom Scholz",
-    "Boston, MA",
-    "MC ⠀•••• 1253",
-    100.81
-  ),
-  createData(
-    3,
-    "16 Mar, 2019",
-    "Michael Jackson",
-    "Gary, IN",
-    "AMEX ⠀•••• 2000",
-    654.39
-  ),
-  createData(
-    4,
-    "15 Mar, 2019",
-    "Bruce Springsteen",
-    "Long Branch, NJ",
-    "VISA ⠀•••• 5919",
-    212.79
-  ),
-];
 
 function preventDefault(event) {
   event.preventDefault();
@@ -80,16 +39,39 @@ export default function AppointmentList(props) {
   });
   console.log(filteredMonth);
 
+  let theme = createTheme({
+    palette: {
+      type: "light",
+      primary: {
+        main: purple[800],
+      },
+      secondary: {
+        main: green.A400,
+      },
+    },
+    typography: {
+      color: "#fff",
+    },
+  });
+
   return (
-    <React.Fragment>
+    <ThemeProvider theme={theme}>
       <Title>Upcoming Appointments</Title>
       <Table size="small">
         <TableHead>
           <TableRow>
-            <TableCell>Customer Name</TableCell>
-            <TableCell>Appointment Date/Time</TableCell>
-            <TableCell>Email Address</TableCell>
-            <TableCell>Phone Number</TableCell>
+            <TableCell>
+              <Typography color="#fff">Customer Name</Typography>
+            </TableCell>
+            <TableCell>
+              <Typography color="#fff">Appointment Date/Time</Typography>
+            </TableCell>
+            <TableCell>
+              <Typography color="#fff">Email Address</Typography>
+            </TableCell>
+            <TableCell>
+              <Typography color="#fff">Phone Number</Typography>
+            </TableCell>
             {/* <TableCell align="right">Sale Amount</TableCell> */}
           </TableRow>
         </TableHead>
@@ -97,16 +79,24 @@ export default function AppointmentList(props) {
           {filteredMonth.map((booking, i) => (
             <TableRow key={i}>
               <TableCell>
-                {booking.first_name + " " + booking.last_name}
+                <Typography color="#fff">
+                  {booking.first_name + " " + booking.last_name}
+                </Typography>
               </TableCell>
               <TableCell>
-                {moment(booking.startDate).format("dddd, MMM Do YY HH:MM") +
-                  " " +
-                  moment(booking.endDate).format("hh:mm LT")}
+                <Typography color="#fff">
+                  {moment(booking.startDate).format("dddd, MMM Do YY HH:MM") +
+                    " " +
+                    moment(booking.endDate).format("hh:mm LT")}
+                </Typography>
               </TableCell>
 
-              <TableCell>{booking.email}</TableCell>
-              <TableCell>{booking.phone_number}</TableCell>
+              <TableCell>
+                <Typography color="#fff">{booking.email}</Typography>
+              </TableCell>
+              <TableCell>
+                <Typography color="#fff">{booking.phone_number}</Typography>
+              </TableCell>
               {/* <TableCell align="right">{`$${booking.amount}`}</TableCell> */}
             </TableRow>
           ))}
@@ -115,6 +105,6 @@ export default function AppointmentList(props) {
       <Link color="primary" href="#" onClick={preventDefault} sx={{ mt: 3 }}>
         See more appointments
       </Link>
-    </React.Fragment>
+    </ThemeProvider>
   );
 }

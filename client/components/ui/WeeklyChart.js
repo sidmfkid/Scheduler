@@ -11,40 +11,61 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { Box } from "@mui/material";
+import { createTheme, ThemeProvider, styled } from "@mui/material/styles";
+import { purple, green } from "@mui/material/colors";
 
 const WeeklyChart = (props) => {
   const data = props.chartData;
+  let theme = createTheme({
+    palette: {
+      type: "light",
+      primary: {
+        main: purple[800],
+      },
+      secondary: {
+        main: green.A400,
+      },
+    },
+    typography: {
+      color: "#fff",
+    },
+  });
 
   return (
-    <Box
-      sx={{
-        width: "80%",
-        height: "auto",
-        display: "block",
-      }}
-    >
-      <ResponsiveContainer width="100%" height={350}>
-        <BarChart
-          width={500}
-          height={300}
-          data={data}
-          margin={{
-            top: 20,
-            right: 30,
-            left: 20,
-            bottom: 5,
-          }}
-        >
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="name" />
-          <YAxis />
-          <Tooltip />
-          <Legend />
-          <Bar dataKey="Appointments" fill="#8884d8" />
-          {/* <Bar dataKey="uv" stackId="a" fill="#82ca9d" /> */}
-        </BarChart>
-      </ResponsiveContainer>
-    </Box>
+    <ThemeProvider theme={theme}>
+      <Box
+        sx={{
+          width: "80%",
+          height: "auto",
+          display: "block",
+        }}
+      >
+        <ResponsiveContainer width="100%" height={350}>
+          <BarChart
+            width={500}
+            height={300}
+            data={data}
+            margin={{
+              top: 20,
+              right: 30,
+              left: 20,
+              bottom: 5,
+            }}
+          >
+            <CartesianGrid
+              stroke={theme.palette.secondary.light}
+              strokeDasharray="5 5"
+            />
+            <XAxis stroke={theme.palette.secondary.light} dataKey="name" />
+            <YAxis stroke={theme.palette.secondary.light} />
+            <Tooltip />
+            <Legend />
+            <Bar dataKey="Appointments" fill={theme.palette.secondary.main} />
+            {/* <Bar dataKey="uv" stackId="a" fill="#82ca9d" /> */}
+          </BarChart>
+        </ResponsiveContainer>
+      </Box>
+    </ThemeProvider>
   );
 };
 

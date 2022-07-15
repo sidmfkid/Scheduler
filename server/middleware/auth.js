@@ -1,14 +1,13 @@
 import { Shopify } from "@shopify/shopify-api";
-
+const { gdprTopics } = require("@shopify/shopify-api/dist/webhooks/registry");
 import StoreModel from "../models/storeModel";
 import SessionModel from "../models/sessionModel";
 import topLevelAuthRedirect from "../utils/topLevelAuthRedirect";
-import { webhookRegistrar } from "../webhooks/webhookRegistrar";
+// import { webhookRegistrar } from "../webhooks/webhookRegistrar";
 
 const applyAuthMiddleware = (app) => {
   app.get("/auth", async (req, res) => {
     if (!req.signedCookies[app.get("top-level-oauth-cookie")]) {
-      console.log(req.signedCookies);
       return res.redirect(`/auth/toplevel?shop=${req.query.shop}`);
     }
 
@@ -17,23 +16,42 @@ const applyAuthMiddleware = (app) => {
       res,
       req.query.shop,
       "/auth/tokens",
-      false
+      false //offline token
     );
-
     res.redirect(redirectUrl);
   });
 
   app.get("/auth/tokens", async (req, res) => {
-    if (!req.signedCookies[app.get("top-level-oauth-cookie")]) {
-      return res.redirect(`/auth/toplevel?shop=${req.query.shop}`);
-    }
+    const session = await Shopify.Auth.validateAuthCallback(
+      req,
+      res,
+      req.query
+    );
+
+    const { shop, accessToken } = session;
+
+    const webhookRegistrar = await Shopify.Webhooks.Registry.registerAll({
+      shop,
+      accessToken,
+    });
+
+    Object.entries(webhookRegistrar).map(([topic, response]) => {
+      if (!response.success && !gdprTopics.includes(topic)) {
+        console.error(
+          `--> Failed to register ${topic} for ${shop}.`,
+          response.result.errors[0].message
+        );
+      } else if (!gdprTopics.includes(topic)) {
+        console.log(`--> Registered ${topic} for ${shop}`);
+      }
+    });
 
     const redirectUrl = await Shopify.Auth.beginAuth(
       req,
       res,
       req.query.shop,
       "/auth/callback",
-      app.get("use-online-tokens")
+      true //online tokens
     );
 
     res.redirect(redirectUrl);
@@ -53,7 +71,6 @@ const applyAuthMiddleware = (app) => {
         apiKey: Shopify.Context.API_KEY,
         hostName: Shopify.Context.HOST_NAME,
         shop: req.query.shop,
-        host: req.query.host,
       })
     );
   });
@@ -69,12 +86,12 @@ const applyAuthMiddleware = (app) => {
       const host = req.query.host;
       const { shop } = session;
 
-      await webhookRegistrar(session); //Register all webhooks
       await StoreModel.findOneAndUpdate({ shop }, { isActive: true }); //Update store to true after auth has happened, or it'll cause reinstall issues.
 
       // Redirect to app with shop parameter upon auth
       res.redirect(`/?shop=${shop}&host=${host}`);
     } catch (e) {
+      const { shop } = req.query;
       switch (true) {
         case e instanceof Shopify.Errors.InvalidOAuthError:
           res.status(400);
@@ -86,7 +103,7 @@ const applyAuthMiddleware = (app) => {
           // Delete sessions and restart installation
           await StoreModel.findOneAndUpdate({ shop }, { isActive: false });
           await SessionModel.deleteMany({ shop });
-          res.redirect(`/auth?shop=${req.query.shop}&host=${req.query.host}`);
+          res.redirect(`/auth?shop=${shop}`);
           break;
         default:
           res.status(500);

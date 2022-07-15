@@ -1,24 +1,39 @@
 import React, { useState, useEffect } from "react";
 import { Box, Grid, Paper } from "@mui/material";
-import { styled } from "@mui/material/styles";
+import { createTheme, ThemeProvider, styled } from "@mui/material/styles";
 import WeeklyCard from "../ui/WeeklyCard";
 import MonthlyCard from "../ui/MonthlyCard";
 import moment from "moment";
 import { Week } from "react-big-calendar";
 import AppointmentList from "../ui/AppointmentList";
 import SummaryCard from "../ui/SummaryCard";
+import BlurBG from "../ui/BlurBg";
+import { purple, green } from "@mui/material/colors";
 
 const Item = styled(Paper)(({ theme }) => ({
-  backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
+  background: "linear-gradient(120deg, #37006abd 60%, #9b4dcbb3)",
+
   ...theme.typography.body2,
   padding: theme.spacing(1),
   textAlign: "center",
-  color: theme.palette.text.secondary,
+  color: "#fff",
+  position: "relative",
+  overflow: "hidden",
 }));
 
 const Dashboard = (props) => {
   const getData = props.getData;
-
+  let theme = createTheme({
+    palette: {
+      type: "light",
+      primary: {
+        main: purple[800],
+      },
+      secondary: {
+        main: green.A400,
+      },
+    },
+  });
   const bookingData = getData.data;
   const currentDate = getData.currentDate;
 
@@ -117,9 +132,9 @@ const Dashboard = (props) => {
   console.log(filteredMonth, filteredWeek, graphDays, chartData);
 
   return (
-    <Grid container spacing={2}>
+    <Grid padding={"0 3rem"} container spacing={2}>
       <Grid item xs={12} sm={12} md={6}>
-        <Item sx={{ marginTop: "2rem" }}>
+        <Item sx={{ marginTop: "2rem", padding: "2rem 0rem" }}>
           <WeeklyCard
             getData={getData}
             chartData={chartData}
@@ -129,18 +144,18 @@ const Dashboard = (props) => {
         </Item>
       </Grid>
       <Grid item xs={12} sm={12} md={6}>
-        <Item sx={{ marginTop: "2rem" }}>
+        <Item sx={{ marginTop: "2rem", padding: "2rem 0rem" }}>
           <MonthlyCard getData={getData} filteredMonth={filteredMonth} />
         </Item>
       </Grid>
       <Grid item xs={12} sm={8} md={8}>
-        <Item>
+        <Item sx={{ padding: "1rem 2rem 2rem 2rem" }}>
           <AppointmentList getData={getData} />
         </Item>
       </Grid>
 
       <Grid item xs={12} sm={4} md={4}>
-        <Item>
+        <Item sx={{ padding: "1rem 2rem 2rem 2rem" }}>
           <SummaryCard
             filteredWeek={filteredWeek}
             filteredMonth={filteredMonth}

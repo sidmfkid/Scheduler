@@ -26,8 +26,10 @@ export default function MenuAppBar(props) {
 
   useEffect(() => {
     const pagePath = window.location.pathname.split("/");
-    const pageTitle =
-      pagePath[1][0].toUpperCase() + pagePath[1].slice(1, pagePath[1].length);
+    const pageTitle = pagePath[1][0]
+      ? pagePath[1][0].toUpperCase() + pagePath[1].slice(1, pagePath[1].length)
+      : "Auth";
+
     setPageTitle((title) => pageTitle);
   }, [pageTitle]);
 
@@ -58,7 +60,11 @@ export default function MenuAppBar(props) {
   };
 
   return (
-    <Box sx={{ flexGrow: 1 }}>
+    <Box
+      sx={{
+        flexGrow: 1,
+      }}
+    >
       {/* <FormGroup>
         <FormControlLabel
           control={
@@ -71,7 +77,10 @@ export default function MenuAppBar(props) {
           label={auth ? "Logout" : "Login"}
         />
       </FormGroup> */}
-      <AppBar position="static">
+      <AppBar
+        sx={{ background: "linear-gradient(120deg, #37006abd 60%, #9b4dcbb3)" }}
+        position="static"
+      >
         <Toolbar>
           {/* <IconButton
             size="large"
@@ -88,7 +97,13 @@ export default function MenuAppBar(props) {
             aria-label="menu"
             onClick={toggleDrawer(anchor, true)}
           />
-          <MenuDrawer toggleDrawer={toggleDrawer} state={state} />
+          <MenuDrawer
+            sx={{
+              background: "linear-gradient(120deg, #37006abd 60%, #9b4dcbb3)",
+            }}
+            toggleDrawer={toggleDrawer}
+            state={state}
+          />
 
           <Typography variant="h6" component="div" sx={{ flexGrow: 1, ml: 2 }}>
             {pageTitle}
