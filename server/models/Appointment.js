@@ -11,6 +11,7 @@ const AppointmentSchema = new mongoose.Schema({
   },
   services: [{ type: mongoose.Schema.Types.ObjectId, ref: "Service" }],
   assigned_resource: { type: mongoose.Schema.Types.ObjectId, ref: "Resource" },
+  store: { type: mongoose.Schema.Types.ObjectId, ref: "Active_Stores" },
 });
 
 const AppointmentModel = mongoose.model("Appointment", AppointmentSchema);

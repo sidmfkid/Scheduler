@@ -9,7 +9,7 @@ const isActiveShop = async (req, res, next) => {
   }
 
   const isShopAvaialble = await StoreModel.findOne({ shop });
-  console.log(isShopAvaialble);
+
   if (isShopAvaialble === null || !isShopAvaialble.isActive) {
     if (isShopAvaialble === null) {
       await StoreModel.create({ shop, isActive: false });

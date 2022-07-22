@@ -9,12 +9,33 @@ import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Badge from "@mui/material/Badge";
 import Image from "mui-image";
 import Checkbox from "@mui/material/Checkbox";
-import { Button } from "@mui/material";
-import { styled } from "@mui/material/styles";
+import { Button, CircularProgress } from "@mui/material";
+import {
+  styled,
+  createTheme,
+  ThemeProvider,
+  alpha,
+} from "@mui/material/styles";
+import { green, purple } from "@mui/material/colors";
 import EditProductModal from "./EditProductModal";
 
+let theme = createTheme({
+  palette: {
+    type: "light",
+    primary: {
+      main: purple[800],
+    },
+    secondary: {
+      main: green.A400,
+    },
+  },
+  typography: {
+    color: "#fff",
+  },
+});
+
 const Item = styled(Paper)(({ theme }) => ({
-  backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
+  backgroundColor: "transparent",
   ...theme.typography.body2,
   padding: theme.spacing(1),
   textAlign: "center",
@@ -38,8 +59,7 @@ const ServiceList = (props) => {
   const getAllProducts = props.getAllProducts;
   const imported = props.imported;
   const isFetched = props.isFetched;
-
-  const { success, error, loading } = props;
+  const { success, error, loading, setSaved, isSaved } = props;
 
   const handleToggle = (value) => () => {
     const currentIndex = checked.indexOf(value);
@@ -54,7 +74,12 @@ const ServiceList = (props) => {
     setChecked(newChecked);
   };
 
-  let ListEls = getAllProducts.map((product) => {
+  const allTagsUsed = imported.map((data) =>
+    data.tags !== "[object Undefined]" ? data.tags : "Undefined"
+  );
+  const allTags = [...new Set(allTagsUsed)];
+
+  let ListEls = getAllProducts.map((product, i) => {
     const filter = imported.filter(
       (data) => data.shopify_id === product.id
     ).length;
@@ -66,7 +91,12 @@ const ServiceList = (props) => {
           key={product.id}
           secondaryAction={
             <Box sx={{ display: "inline-block", position: "relative" }}>
-              <EditProductModal imported={imported} />
+              <EditProductModal
+                setSaved={setSaved}
+                isSaved={isSaved}
+                imported={imported[i]}
+                allTags={allTags}
+              />
               {loading && (
                 <CircularProgress
                   size={24}
@@ -83,6 +113,10 @@ const ServiceList = (props) => {
             </Box>
           }
           disablePadding
+          sx={{
+            width: "calc(20rem + 20vw)",
+            backgroundColor: alpha(theme.palette.secondary.dark, 0.4),
+          }}
         >
           <Item sx={{ width: "100%" }}>
             <ListItemButton>
@@ -105,6 +139,7 @@ const ServiceList = (props) => {
                   display: "block",
                   margin: "0 0 0 2rem",
                   textAlign: "center",
+                  color: "white",
                 }}
                 id={labelId}
                 primary={`${product.title}`}
@@ -126,6 +161,10 @@ const ServiceList = (props) => {
             />
           }
           disablePadding
+          sx={{
+            width: "calc(20rem + 20vw)",
+            backgroundColor: alpha(theme.palette.primary.light, 0.4),
+          }}
         >
           <Item sx={{ width: "100%" }}>
             <ListItemButton>
@@ -143,6 +182,7 @@ const ServiceList = (props) => {
                   display: "block",
                   margin: "0 0 0 2rem",
                   textAlign: "center",
+                  color: "white",
                 }}
                 id={labelId}
                 primary={`${product.title}`}
@@ -156,7 +196,18 @@ const ServiceList = (props) => {
 
   return (
     <Box sx={{ width: "100%" }}>
-      <List dense sx={{ width: "100%", bgcolor: "background.paper" }}>
+      <List
+        dense
+        sx={{
+          width: "100%",
+          bgcolor: "transparent",
+          padding: "0 2rem",
+          display: "flex",
+          flexWrap: "wrap",
+          justifyContent: "center",
+          gap: "12px",
+        }}
+      >
         {isFetched === true ? ListEls : <NoList />}
       </List>
     </Box>

@@ -8,16 +8,16 @@ import { Box } from "@mui/material/";
 import MenuAppBar from "./components/MenuAppBar";
 import { Routes, Route, Link } from "react-router-dom";
 import Appointment from "./components/routes/Appointment";
+import MyCalendar from "./components/routes/Calendar";
 import Dashboard from "./components/routes/Dashboard";
 import Services from "./components/routes/Services";
 import Settings from "./components/routes/Settings";
 import Availability from "./components/routes/Availability";
 import Plans from "./components/routes/Plans";
 import Resources from "./components/routes/Resources";
-import axios from "axios";
 import { purple, green } from "@mui/material/colors";
-import { flash } from "react-universal-flash";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+
 // const schedulerData = data.map((data) => {
 //   return {
 //     startDate: data.startDate,
@@ -31,20 +31,11 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 //https://devexpress.github.io/devextreme-reactive/react/scheduler/docs/guides/getting-started/
 
 const App = () => {
+  const schedulerData = data;
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
-
-  const date = moment().format().split("T");
-
-  const schedulerData = data;
-  const currentDate = date[0];
   const [getPageTitle, setPageTitle] = useState();
-  const [getData, setData] = useState({
-    data: schedulerData,
-    currentDate: currentDate,
-  });
-  const [isFetched, setFetched] = useState(false);
 
   let theme = createTheme({
     palette: {
@@ -58,101 +49,18 @@ const App = () => {
     },
   });
 
-  useEffect(() => {
-    if (isFetched === false) {
-      getAppointmentData();
-    }
-    console.log(success, error, loading);
-
-    if (error) {
-      flash("Oops looks like something went wrong", 5000, "error");
-    }
-    if (success) {
-      flash("Success!", 4000, "success");
-    }
-    if (loading) {
-      flash("Loading, One moment please", 3000, "info");
-    }
-    return function cleanUp() {
-      setError(false);
-      setSuccess(false);
-      setLoading(false);
-    };
-  });
-
-  function getAppointmentData() {
-    setLoading(true);
-
-    axios
-      .get("/appointments/all")
-      .then((res) => setAppointmentData(res.data))
-      .then((data) => {
-        setSuccess(true);
-        setLoading(false);
-      })
-      .catch((error) => {
-        setLoading(false);
-        setError(true);
-
-        console.log(error);
-      });
-  }
-
-  function setAppointmentData(data) {
-    console.log(data.data[1].customer.email);
-    const newArr = data.data.map((booking) => {
-      if (booking.customer) {
-        return {
-          startDate: booking.startDate,
-          endDate: booking.endDate,
-          email: booking.customer.email || "",
-          first_name: booking.customer.first_name,
-          last_name: booking.customer.last_name,
-          phone_number: booking.customer.phone_number,
-          services: booking.services,
-          title: "Consultation",
-        };
-      } else {
-        return {
-          startDate: booking.startDate,
-          endDate: booking.endDate,
-          services: booking.services,
-          title: "Consultation",
-        };
-      }
-    });
-    setData({ data: newArr, currentDate: currentDate });
-    setFetched(true);
-  }
-
   return (
     <ThemeProvider theme={theme}>
       <Box
         sx={{
           position: "relative",
           width: "100%",
-          height: "100%",
+          height: "100vh",
           background: `linear-gradient( to right top,${theme.palette.primary.main}, ${theme.palette.primary.light})`,
-          overflow: "hidden",
         }}
       >
         {/* radial-gradient(ellipse at top, #ce6bfe, #ff9dfe, transparent, #00e676da 60%, transparent),radial-gradient(ellipse at center, #00e676d6, #6a1b9a, transparent) */}
-        <Box
-          position={"absolute"}
-          width={"100%"}
-          height={"100%"}
-          zIndex="0"
-          sx={{
-            backgroundImage:
-              "url('https://images.unsplash.com/photo-1573614999645-e5f0f16ec15d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80')",
 
-            filter: "blur(100px)",
-            mixBlendMode: "plus-light",
-
-            top: "0px",
-            left: "0px",
-          }}
-        />
         <Box
           position={"absolute"}
           width={"25%"}
@@ -187,41 +95,38 @@ const App = () => {
             left: "450px",
           }}
         />
-        <Box sx={{ position: "relative", zIndex: "2" }}>
+        <Box
+          sx={{
+            position: "relative",
+            zIndex: "2",
+            overflowX: "hidden",
+            height: "100%",
+          }}
+        >
+          <Box
+            position={"fixed"}
+            width={"100%"}
+            height={"100%"}
+            zIndex="-1"
+            sx={{
+              backgroundImage:
+                "url('https://images.unsplash.com/photo-1573614999645-e5f0f16ec15d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80')",
+
+              filter: "blur(100px)",
+              mixBlendMode: "plus-light",
+              backgroundPosition: "center",
+              backgroundSize: "cover",
+              backgroundRepeat: "no-repeat",
+              top: "0px",
+              left: "0px",
+            }}
+          />
           <MenuAppBar setPageTitle={setPageTitle} getPageTitle={getPageTitle} />
           <Routes>
-            <Route
-              path="/home"
-              element={
-                <Dashboard currentDate={currentDate} getData={getData} />
-              }
-            />
-            <Route
-              path="/"
-              element={
-                <Appointment
-                  currentDate={currentDate}
-                  getData={getData}
-                  setData={setData}
-                />
-              }
-            />
-            <Route
-              path="appointments"
-              element={
-                <Appointment
-                  currentDate={currentDate}
-                  getData={getData}
-                  setData={setData}
-                />
-              }
-            />
-            <Route
-              path="dashboard"
-              element={
-                <Dashboard currentDate={currentDate} getData={getData} />
-              }
-            />
+            <Route path="/home" element={<Dashboard />} />
+            <Route path="/" element={<MyCalendar />} />
+            <Route path="appointments" element={<MyCalendar />} />
+            <Route path="dashboard" element={<Dashboard />} />
             <Route path="availability" element={<Availability />} />
             <Route path="plans" element={<Plans />} />
             <Route path="resources" element={<Resources />} />

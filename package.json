@@ -20,10 +20,12 @@
   "author": "Thomas Sentre",
   "license": "ISC",
   "dependencies": {
+    "@date-io/moment": "^2.14.0",
     "@devexpress/dx-react-core": "^3.0.3",
     "@devexpress/dx-react-scheduler": "^3.0.3",
     "@devexpress/dx-react-scheduler-material-ui": "^3.0.3",
     "@hot-loader/react-dom": "^17.0.1",
+    "@mui/x-date-pickers": "^5.0.0-beta.1",
     "@shopify/shopify-api": "^4.0.0",
     "axios": "^0.27.2",
     "body-parser": "^1.20.0",

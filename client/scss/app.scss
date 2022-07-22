@@ -1,5 +1,23 @@
+@use "sass:color";
 @import '../../node_modules/react-big-calendar/lib/sass/styles';
 @import '../../node_modules/react-big-calendar/lib/addons/dragAndDrop/styles';
+
+
+html {
+    --color-primary: #691b99;
+    --color-primary-light: #9b4dcb;
+    --color-primary-dark: #37006a;
+    --color-secondary: #00e575;
+    --color-secondary-light: #66ffa5;
+    --color-secondary-dark: #00b147;
+}
+
+$primary: var(--color-primary);
+$primary-light: var(--color-primary-light);
+$primary-dark: var(--color-primary-dark);
+$secondary: var(--color-secondary);
+$secondary-light: var(--color-secondary-light);
+$secondary-dark: var(--color-secondary-dark);
 
 .cal-container{
     height: 80vh;
@@ -10,6 +28,185 @@ a, a:link, a:visited {
     color: unset;
 }
 
+body {
+    height: 100%;
+}
+
+.CUSTOM-scheduler {
+.CUSTOM-toolBar{
+
+        &.MuiToolbar-regular.Toolbar-toolbar {
+            border-bottom: 2px solid $primary-light;
+        }
+
+.MuiButton-outlined{
+    color: $secondary ;
+    border-color: $secondary ;
+    &:hover {
+        background-color: $secondary ;
+        color: $primary-dark ;
+    }
+}
+
+.MuiSvgIcon-root{
+    fill: $secondary ;
+}
+
+.MuiButton-root{
+    color: $secondary ;
+
+}
+
+.Switcher-inputRoot{
+    color: $secondary ;
+
+}
+.Switcher-inputRoot{
+    &:active, &:hover{
+
+        .MuiOutlinedInput-notchedOutline {
+            border-color: $secondary;
+            }
+            .MuiSelect-select{
+                color: $primary ;
+            background-color: $secondary;
+
+            }
+            .MuiSvgIcon-root{
+                fill: $primary ;
+            }
+    }
+
+}
+.Mui-focused {
+    .MuiSelect-select{
+        color: $secondary ;
+    }
+    .MuiSvgIcon-root{
+        fill: $secondary ;
+    }
+    .MuiOutlinedInput-notchedOutline{
+    border-color: $secondary;
+border-width: 2px;
+
+}}
+
+.MuiOutlinedInput-notchedOutline{
+    border-color: $secondary ;
+
+}
+.MuiSelect-select.MuiSelect-outlined.Switcher-input {
+    border-color: $secondary ;
+
+}
+
+
+}
+
+
+// TABLE !!
+
+.MainLayout-stickyElement{
+    background-color: rgba(0 ,0, 0, 0.12) !important;
+    background: rgba(0 ,0, 0, 0.12) !important;
+
+    .Label-text{
+    color: white !important;
+    }
+    .MuiTableCell-root {
+        .Cell-dayOfWeek{
+            color: white !important;
+        }
+
+    }
+    .MainLayout-ordinaryHeaderBorder{
+
+    }
+}
+.MuiTableCell-root.MuiTableCell-body.MuiTableCell-sizeMedium.Cell-cell{
+border-right: 1px solid $primary-light;
+border-bottom: 1px solid $primary-light;
+// border-collapse: collapse;
+// border-spacing: 0;
+
+.Cell-text{
+    color: white;
+    &.Cell-otherMonth {
+        color: rgba(255, 255, 255, 0.38);
+    }
+}
+}
+div.MainLayout-stickyElement.MainLayout-header.MainLayout-flexRow{
+    background-color: rgba(0 ,0, 0, 0.12) !important;
+    background: rgba(0 ,0, 0, 0.12) !important;
+div.MainLayout-background.MainLayout-inlineFlex.MainLayout-ordinaryHeaderBorder{
+    background-color: rgba(0 ,0, 0, 0.12) !important;
+    background: rgba(0 ,0, 0, 0.12) !important;
+    border-bottom: 1px solid $primary-light;
+    // border-collapse: collapse;
+    // border-spacing: 0;
+    .Cell-dayView{
+        .Cell-dayOfWeek{
+    color: white !important;
+        }
+        .Cell-dayOfMonth{
+    color: white !important;
+
+        }
+    }
+}
+}
+}
+
+
+.CUSTOM-toolTip {
+    .MuiPaper-root{
+        background-color: rgba($primary, 50%);
+
+        .Content-title{
+            color: white,
+    
+        }
+        .MuiSvgIcon-root{
+            fill: $primary;
+        }
+    }
+
+
+}
+
+.CUSTOM-appointmentForm {
+    .MuiButton-root{
+        &:disabled{
+        background-color: $secondary-light;
+        }
+        &:enabled{
+            background-color: $primary;
+            }
+        background-color: $primary;
+    }
+}
+
+
+
+[role="listbox"]{
+    background-color: $primary !important;
+    color: $secondary;
+    li{
+        &:hover{
+            background-color: rgba(0 ,0, 0, 0.12);
+        }
+        &:active{
+            background-color: rgba(0 ,0, 0, 0.12);
+    color: $secondary-light;
+    outline-width: 1px;
+    outline-color: $primary-light;
+    outline-style: solid;
+
+        }
+    }
+
+}
 
 @keyframes gradientSkew1 {
     0% {
@@ -17,7 +214,7 @@ a, a:link, a:visited {
         opacity: .5;
     }
     50% {
-        transform: rotate(180deg) scale(2.5);
+        transform: scale(2.5);
         opacity: .3;
     }
     100%{

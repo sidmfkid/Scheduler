@@ -9,6 +9,7 @@ import AppointmentList from "../ui/AppointmentList";
 import SummaryCard from "../ui/SummaryCard";
 import BlurBG from "../ui/BlurBg";
 import { purple, green } from "@mui/material/colors";
+import axios from "axios";
 
 const Item = styled(Paper)(({ theme }) => ({
   background: "linear-gradient(120deg, #37006abd 60%, #9b4dcbb3)",
@@ -22,7 +23,93 @@ const Item = styled(Paper)(({ theme }) => ({
 }));
 
 const Dashboard = (props) => {
-  const getData = props.getData;
+  const [success, setSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
+  const [isFetched, setFetched] = useState(false);
+  const date = moment().format().split("T");
+  const today = date[0];
+  const [getData, setData] = useState({
+    data: [],
+    currentDate: today,
+    resources: [],
+  });
+  useEffect(() => {
+    getAppointmentData();
+
+    if (error) {
+      flash("Oops looks like something went wrong", 5000, "error");
+    }
+    if (success) {
+      flash("Success!", 4000, "success");
+    }
+    if (loading) {
+      flash("Loading, One moment please", 3000, "info");
+    }
+    // return function cleanUp() {
+    //   getAppointmentData();
+    //   setError(false);
+    //   setSuccess(false);
+    //   setLoading(false);
+    // };
+  }, []);
+
+  async function getAppointmentData() {
+    if (isFetched === false) {
+      setLoading(true);
+      axios
+        .get("/appointments/all")
+        .then((res) => {
+          console.log(res.data);
+          setAppointmentData(res.data);
+        })
+        .catch((error) => {
+          setLoading(false);
+          setError(true);
+          console.log(error);
+        });
+
+      setSuccess(true);
+      setLoading(false);
+    }
+  }
+  function setAppointmentData(data) {
+    const newArr = data.data.map((booking) => {
+      const startDate = moment(booking.startDate).format("YYYY-DD-MMTHH:mm");
+      const endDate = moment(booking.endDate).format("YYYY-DD-MMTHH:mm");
+      if (booking.customer) {
+        return {
+          id: booking._id,
+          startDate: booking.startDate,
+          endDate: booking.endDate,
+          email: booking.customer.email || "",
+          first_name: booking.customer.first_name,
+          last_name: booking.customer.last_name,
+          phone_number: booking.customer.phone_number,
+          services: booking.services.map((data) => {
+            return data.title;
+          }),
+          title: "Consultation",
+        };
+      } else {
+        return {
+          id: booking._id,
+          startDate: booking.startDate,
+          endDate: booking.endDate,
+          services: booking.services.map((data) => {
+            return data.title;
+          }),
+          title: "Consultation",
+        };
+      }
+    });
+    // const resourceArr = data.data.map();
+    setData((data) => {
+      return { ...data, data: newArr, currentDate: currentDate };
+    });
+    setFetched(true);
+  }
+
   let theme = createTheme({
     palette: {
       type: "light",

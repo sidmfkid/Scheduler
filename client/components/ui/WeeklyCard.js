@@ -39,7 +39,7 @@ function WeeklyCard(props) {
     console.log("hello", getCurrentCount);
   }, [getCurrentCount]);
 
-  console.log(getCurrentRange);
+  console.log(bookingData, "WEEKLY CARD BOOKING DATA");
 
   function setWeek() {
     // setCount(e);
@@ -67,6 +67,7 @@ function WeeklyCard(props) {
         return;
       }
     });
+    console.log(filteredWeek, "FILTERED WEEK WEEKLYCARD.JS");
 
     let graphDays = {
       Sun: [],
@@ -79,22 +80,29 @@ function WeeklyCard(props) {
     };
     filteredWeek.map((day) => {
       const bookingDay = moment(day.startDate).format("ddd");
-
+      console.log(bookingDay);
       switch (bookingDay) {
         case "Sun":
           graphDays.Sun.push(day);
+          break;
         case "Mon":
           graphDays.Mon.push(day);
+          break;
         case "Tues":
           graphDays.Tues.push(day);
+          break;
         case "Wed":
           graphDays.Wed.push(day);
+          break;
         case "Thurs":
           graphDays.Thurs.push(day);
+          break;
         case "Fri":
           graphDays.Fri.push(day);
+          break;
         case "Sat":
           graphDays.Sat.push(day);
+          break;
         default:
           break;
       }

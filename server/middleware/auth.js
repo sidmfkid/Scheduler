@@ -6,6 +6,7 @@ import topLevelAuthRedirect from "../utils/topLevelAuthRedirect";
 // import { webhookRegistrar } from "../webhooks/webhookRegistrar";
 
 const applyAuthMiddleware = (app) => {
+  console.log("MIDDLEWARE FIRED");
   app.get("/auth", async (req, res) => {
     if (!req.signedCookies[app.get("top-level-oauth-cookie")]) {
       return res.redirect(`/auth/toplevel?shop=${req.query.shop}`);

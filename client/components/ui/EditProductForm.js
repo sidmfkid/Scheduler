@@ -1,7 +1,8 @@
-import * as React from "react";
+import React, { useState, useEffect } from "react";
 import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
-import Input from "@mui/material/Input";
+import { Input, Select, MenuItem, Chip, Button } from "@mui/material/";
 import FilledInput from "@mui/material/FilledInput";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import InputLabel from "@mui/material/InputLabel";
@@ -11,26 +12,120 @@ import FormControl from "@mui/material/FormControl";
 import TextField from "@mui/material/TextField";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { purple, green } from "@mui/material/colors";
+import axios from "axios";
+import data from "../../../server/productData";
 
-export default function EditProductForm() {
-  const [values, setValues] = React.useState({
-    amount: "",
-    password: "",
-    weight: "",
-    weightRange: "",
-    showPassword: false,
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250,
+    },
+  },
+};
+
+let theme = createTheme({
+  palette: {
+    type: "light",
+    primary: {
+      main: purple[800],
+    },
+    secondary: {
+      main: green.A400,
+    },
+  },
+});
+
+const names = [
+  "Oliver Hansen",
+  "Van Henry",
+  "April Tucker",
+  "Ralph Hubbard",
+  "Omar Alexander",
+  "Carlos Abbott",
+  "Miriam Wagner",
+  "Bradley Wilkerson",
+  "Virginia Andrews",
+  "Kelly Snyder",
+];
+
+function getStyles(name, personName, theme) {
+  return {
+    fontWeight:
+      personName.indexOf(name) === -1
+        ? theme.typography.fontWeightRegular
+        : theme.typography.fontWeightMedium,
+  };
+}
+
+function getHours(num) {
+  return Math.floor(num / 60);
+}
+
+function getMinutes(num) {
+  return (num / 60 - getHours(num)) * 60;
+}
+
+export default function EditProductForm(props) {
+  const { imported, allTags, setSaved, isSaved } = props;
+  const tags = allTags;
+  const importedHours = getHours(imported.duration);
+  const importedMinutes = getMinutes(imported.duration);
+  const [values, setValues] = useState({
+    id: imported._id,
+    hours: importedHours || "",
+    minutes: importedMinutes || "",
+    title: imported.title,
+    resources: [],
+    tags: imported.tags.includes("[object Undefined]")
+      ? ["Undefined"]
+      : [imported.tags],
+    details: imported.details,
   });
 
-  const handleChange = (prop) => (event) => {
-    setValues({ ...values, [prop]: event.target.value });
-  };
+  console.log(values, "AllValues");
 
-  const handleClickShowPassword = () => {
-    setValues({
-      ...values,
-      showPassword: !values.showPassword,
+  useEffect(() => {
+    if (isSaved) {
+      handleSave();
+    }
+  }, [isSaved]);
+
+  const handleChange = (prop) => (event) => {
+    const {
+      target: { value },
+    } = event;
+
+    setValues(() => {
+      if (
+        event.target.id === "resource" ||
+        (event.target.id === "tags" && typeof value === "string")
+      ) {
+        return { ...values, [prop]: value.split(",") };
+      } else {
+        return { ...values, [prop]: event.target.value };
+      }
     });
   };
+
+  const handleSave = () => {
+    console.log(values);
+
+    axios.post("/services/edit", { data: values }).then((res) => {
+      console.log(res.data);
+    });
+  };
+
+  // const handleClickShowPassword = () => {
+  //   setValues({
+  //     ...values,
+  //     showPassword: !values.showPassword,
+  //   });
+  // };
 
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
@@ -39,180 +134,122 @@ export default function EditProductForm() {
   return (
     <Box sx={{ display: "flex", flexWrap: "wrap" }}>
       <div>
+        <Box sx={{ width: "100%" }}>
+          <Typography variant="h6">Edit Product/Serivce Name</Typography>
+        </Box>
         <TextField
-          label="With normal TextField"
+          label="Name"
+          onChange={handleChange("title")}
+          id="outlined-start-adornment"
+          // value={values.title}
+          defaultValue={values.title}
+          sx={{ m: 1, width: "100%" }}
+        />
+
+        <Box sx={{ width: "100%" }}>
+          <Typography variant="h6">Set Duration</Typography>
+        </Box>
+        <TextField
+          label="Hours"
+          inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
+          onChange={handleChange("hours")}
+          defaultValue={values.hours}
           id="outlined-start-adornment"
           sx={{ m: 1, width: "25ch" }}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">kg</InputAdornment>
-            ),
-          }}
         />
-        <FormControl sx={{ m: 1, width: "25ch" }} variant="outlined">
-          <OutlinedInput
-            id="outlined-adornment-weight"
-            value={values.weight}
-            onChange={handleChange("weight")}
-            endAdornment={<InputAdornment position="end">kg</InputAdornment>}
-            aria-describedby="outlined-weight-helper-text"
-            inputProps={{
-              "aria-label": "weight",
-            }}
-          />
-          <FormHelperText id="outlined-weight-helper-text">
-            Weight
-          </FormHelperText>
-        </FormControl>
-        <FormControl sx={{ m: 1, width: "25ch" }} variant="outlined">
-          <InputLabel htmlFor="outlined-adornment-password">
-            Password
-          </InputLabel>
-          <OutlinedInput
-            id="outlined-adornment-password"
-            type={values.showPassword ? "text" : "password"}
-            value={values.password}
-            onChange={handleChange("password")}
-            endAdornment={
-              <InputAdornment position="end">
-                <IconButton
-                  aria-label="toggle password visibility"
-                  onClick={handleClickShowPassword}
-                  onMouseDown={handleMouseDownPassword}
-                  edge="end"
-                >
-                  {values.showPassword ? <VisibilityOff /> : <Visibility />}
-                </IconButton>
-              </InputAdornment>
-            }
-            label="Password"
-          />
-        </FormControl>
-        <FormControl fullWidth sx={{ m: 1 }}>
-          <InputLabel htmlFor="outlined-adornment-amount">Amount</InputLabel>
-          <OutlinedInput
-            id="outlined-adornment-amount"
-            value={values.amount}
-            onChange={handleChange("amount")}
-            startAdornment={<InputAdornment position="start">$</InputAdornment>}
-            label="Amount"
-          />
-        </FormControl>
-      </div>
-      <div>
         <TextField
-          label="With normal TextField"
-          id="filled-start-adornment"
+          label="Minutes"
+          defaultValue={values.minutes}
+          inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
+          onChange={handleChange("minutes")}
+          id="outlined-start-adornment"
           sx={{ m: 1, width: "25ch" }}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">kg</InputAdornment>
-            ),
-          }}
-          variant="filled"
         />
-        <FormControl sx={{ m: 1, width: "25ch" }} variant="filled">
-          <FilledInput
-            id="filled-adornment-weight"
-            value={values.weight}
-            onChange={handleChange("weight")}
-            endAdornment={<InputAdornment position="end">kg</InputAdornment>}
-            aria-describedby="filled-weight-helper-text"
-            inputProps={{
-              "aria-label": "weight",
-            }}
-          />
-          <FormHelperText id="filled-weight-helper-text">Weight</FormHelperText>
-        </FormControl>
-        <FormControl sx={{ m: 1, width: "25ch" }} variant="filled">
-          <InputLabel htmlFor="filled-adornment-password">Password</InputLabel>
-          <FilledInput
-            id="filled-adornment-password"
-            type={values.showPassword ? "text" : "password"}
-            value={values.password}
-            onChange={handleChange("password")}
-            endAdornment={
-              <InputAdornment position="end">
-                <IconButton
-                  aria-label="toggle password visibility"
-                  onClick={handleClickShowPassword}
-                  onMouseDown={handleMouseDownPassword}
-                  edge="end"
-                >
-                  {values.showPassword ? <VisibilityOff /> : <Visibility />}
-                </IconButton>
-              </InputAdornment>
+        <Box sx={{ width: "100%" }}>
+          <Typography variant="h6">Assign Resources</Typography>
+        </Box>
+        <FormControl sx={{ m: 1, width: "100%" }}>
+          <InputLabel id="resource">Resources</InputLabel>
+          <Select
+            labelId="resource"
+            id="resource"
+            multiple
+            value={values.resources}
+            onChange={handleChange("resources")}
+            input={
+              <OutlinedInput id="select-multiple-chip" label="Resources" />
             }
-          />
+            renderValue={(selected) => (
+              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                {selected.map((value) => (
+                  <Chip key={value} label={value} />
+                ))}
+              </Box>
+            )}
+            MenuProps={MenuProps}
+          >
+            {names.map((name) => (
+              <MenuItem
+                key={name}
+                value={name}
+                style={getStyles(name, values.resources, theme)}
+              >
+                {name}
+              </MenuItem>
+            ))}
+          </Select>
         </FormControl>
-        <FormControl fullWidth sx={{ m: 1 }} variant="filled">
-          <InputLabel htmlFor="filled-adornment-amount">Amount</InputLabel>
-          <FilledInput
-            id="filled-adornment-amount"
-            value={values.amount}
-            onChange={handleChange("amount")}
-            startAdornment={<InputAdornment position="start">$</InputAdornment>}
-          />
+        <Box sx={{ width: "100%" }}>
+          <Typography variant="h6">Assign Tags</Typography>
+        </Box>
+        <FormControl sx={{ m: 1, width: "100%" }}>
+          <InputLabel id="tags">Tags</InputLabel>
+          <Select
+            labelId="tags"
+            id="tags"
+            multiple
+            value={values.tags}
+            onChange={handleChange("tags")}
+            input={<OutlinedInput id="tags" label="Tags" />}
+            renderValue={(selected) => (
+              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                {selected.map((value) => (
+                  <Chip key={value} label={value} />
+                ))}
+              </Box>
+            )}
+            MenuProps={MenuProps}
+          >
+            {tags.map((tag) => {
+              if (tag !== "" || tag !== "[object Undefined]") {
+                return (
+                  <MenuItem
+                    key={tag}
+                    value={tag}
+                    style={getStyles(tag, values.tags, theme)}
+                  >
+                    {tag}
+                  </MenuItem>
+                );
+              }
+            })}
+          </Select>
         </FormControl>
-      </div>
-      <div>
-        <TextField
-          label="With normal TextField"
-          id="standard-start-adornment"
-          sx={{ m: 1, width: "25ch" }}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">kg</InputAdornment>
-            ),
-          }}
-          variant="standard"
-        />
-        <FormControl variant="standard" sx={{ m: 1, mt: 3, width: "25ch" }}>
-          <Input
-            id="standard-adornment-weight"
-            value={values.weight}
-            onChange={handleChange("weight")}
-            endAdornment={<InputAdornment position="end">kg</InputAdornment>}
-            aria-describedby="standard-weight-helper-text"
-            inputProps={{
-              "aria-label": "weight",
-            }}
-          />
-          <FormHelperText id="standard-weight-helper-text">
-            Weight
-          </FormHelperText>
-        </FormControl>
-        <FormControl sx={{ m: 1, width: "25ch" }} variant="standard">
-          <InputLabel htmlFor="standard-adornment-password">
-            Password
-          </InputLabel>
-          <Input
-            id="standard-adornment-password"
-            type={values.showPassword ? "text" : "password"}
-            value={values.password}
-            onChange={handleChange("password")}
-            endAdornment={
-              <InputAdornment position="end">
-                <IconButton
-                  aria-label="toggle password visibility"
-                  onClick={handleClickShowPassword}
-                  onMouseDown={handleMouseDownPassword}
-                >
-                  {values.showPassword ? <VisibilityOff /> : <Visibility />}
-                </IconButton>
-              </InputAdornment>
-            }
-          />
-        </FormControl>
-        <FormControl fullWidth sx={{ m: 1 }} variant="standard">
-          <InputLabel htmlFor="standard-adornment-amount">Amount</InputLabel>
-          <Input
-            id="standard-adornment-amount"
-            value={values.amount}
-            onChange={handleChange("amount")}
-            startAdornment={<InputAdornment position="start">$</InputAdornment>}
-          />
-        </FormControl>
+        <Box sx={{ mt: 1, width: "100%" }}>
+          <Button
+            color="secondary"
+            variant="contained"
+            onClick={() => setSaved(true)}
+          >
+            Save
+          </Button>
+          <Button sx={{ mx: 1 }} color="primary" variant="contained">
+            Undo Changes
+          </Button>
+          <Button color="warning" variant="contained">
+            Undo Import
+          </Button>
+        </Box>
       </div>
     </Box>
   );

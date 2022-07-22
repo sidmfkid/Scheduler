@@ -1,8 +1,6 @@
 import express from "express";
 import devBundle from "./devBundle.js"; // comment this line  when you are working in production mode
-import mongoose from "mongoose";
 import dotenv from "dotenv";
-import data from "./appointmentData.js";
 import AppointmentModel from "./models/Appointment.js";
 import ResourceModel from "./models/Resource.js";
 import path from "path";
@@ -30,6 +28,11 @@ import {
 } from "./webhooks/gdpr";
 import template from "./../template";
 import servicesRoutes from "./routes/servicesRoutes.js";
+import resourcesRoutes from "./routes/resourcesRoutes";
+import hmacVerify from "./middleware/hmacVerify";
+import seedAppointments from "./middleware/seedAppointments";
+
+import mongoose from "mongoose";
 
 dotenv.config();
 
@@ -57,6 +60,7 @@ Shopify.Context.initialize({
   API_SECRET_KEY: SHOP_API_SECRET,
   SCOPES: [SHOP_API_SCOPES],
   HOST_NAME: HOST,
+  HOST_SCHEME: "https",
   API_VERSION: "2022-07",
   IS_EMBEDDED_APP: false,
   SESSION_STORAGE: sessionStorage,
@@ -96,8 +100,8 @@ db.once("open", () => console.log("open"));
 
 app.set("top-level-oauth-cookie", "shopify_top_level_oauth");
 app.use(cookieParser(Shopify.Context.API_SECRET_KEY));
-// app.set("use-online-tokens", true);
 applyAuthMiddleware(app);
+// app.set("use-online-tokens", true);
 
 app.use("/webhooks", webhookRoutes);
 app.post("/graphql", verifyRequest(app), async (req, res) => {
@@ -109,30 +113,31 @@ app.post("/graphql", verifyRequest(app), async (req, res) => {
   }
 });
 app.use(bodyParser.json());
+app.use(express.json());
 app.use(csp);
 app.use(isActiveShop);
 app.use("/apps", verifyRequest(app), userRoutes);
-
-app.get("/", async (req, res) => {
-  try {
-    const { shop } = req.query;
-    const isShopAvaialble = await StoreModel.findOne({ shop });
-    console.log(
-      isShopAvaialble,
-      typeof isShopAvaialble !== "undefined",
-      "mainRoute"
-    );
-    if (typeof isShopAvaialble === "undefined") {
-      res.redirect(`/auth?shop=${req.query.shop}`);
-    } else {
-      res.status(200).send(template());
-    }
-  } catch (error) {
-    console.error(error, "ERror home ROUTE /");
-  }
-});
-
 app.use("/services", servicesRoutes);
+app.use("/resources", resourcesRoutes);
+
+// app.get("/", async (req, res) => {
+//   try {
+//     const { shop } = req.query;
+//     const isShopAvaialble = await StoreModel.findOne({ shop });
+//     console.log(
+//       isShopAvaialble,
+//       typeof isShopAvaialble !== "undefined",
+//       "mainRoute"
+//     );
+//     if (typeof isShopAvaialble === "undefined") {
+//       res.redirect(`/auth?shop=${req.query.shop}`);
+//     } else {
+//       res.status(200).send(template());
+//     }
+//   } catch (error) {
+//     console.error(error, "ERror home ROUTE /");
+//   }
+// });
 
 app.get("/home", async (req, res) => {
   try {
@@ -147,9 +152,24 @@ app.get("/appointments", async (req, res) => {
 });
 
 app.get("/appointments/all", async (req, res) => {
-  const allAppointments = await AppointmentModel.find({}).populate("services");
+  try {
+    const session = await Shopify.Utils.loadCurrentSession(req, res);
+    // Create a new client for the specified shop.
+    const client = new Shopify.Clients.Rest(session.shop, session.accessToken);
+    const currentStore = await StoreModel.find({ shop: session.shop });
 
-  res.json({ data: allAppointments });
+    const allAppointments = await AppointmentModel.find({
+      store: currentStore[0]._id,
+    }).populate(
+      "services",
+      "service title details duration shopify_id status tags image"
+    );
+
+    console.log(allAppointments);
+    res.json({ data: allAppointments });
+  } catch (error) {
+    console.log(error);
+  }
 });
 
 app.get("/dashboard", async (req, res) => {
@@ -168,10 +188,6 @@ app.get("/plans", async (req, res) => {
   res.status(200).send(template());
 });
 
-app.get("/resources", async (req, res) => {
-  res.status(200).send(template());
-});
-
 app.get("/services", async (req, res) => {
   res.status(200).send(template());
 });
@@ -184,6 +200,34 @@ app.get("/appointments", async (req, res) => {
   res.status(200).send(template());
 });
 
+app.get("/populate", seedAppointments, async (req, res) => {
+  try {
+    res.status(200).json({ data: res.locals.appData });
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+app.use("/*", async (req, res, next) => {
+  res.status(200).send(template());
+});
+//   try {
+//     const { shop } = req.query;
+//     const isShopAvaialble = await StoreModel.findOne({ shop });
+//     console.log(
+//       isShopAvaialble,
+//       typeof isShopAvaialble !== "undefined",
+//       "mainRoute"
+//     );
+//     if (typeof isShopAvaialble === "undefined") {
+//       res.redirect(`/auth?shop=${req.query.shop}`);
+//     } else {
+//       res.status(200).send(template());
+//     }
+//   } catch (error) {
+//     console.error(error, "ERror home ROUTE /");
+//   }
+//
 let port = process.env.PORT || 3000;
 app.listen(port, (err) => {
   if (err) {
