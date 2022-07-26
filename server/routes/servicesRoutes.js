@@ -36,7 +36,7 @@ servicesRoutes.get("/all", async (req, res) => {
     const storeID = mongoose.Types.ObjectId(currentStore._id);
     const importedServices = await ServiceModel.find({
       shop: storeID,
-    });
+    }).populate("resources");
     // console.log(importedServices, storeID);
 
     res
@@ -84,16 +84,21 @@ servicesRoutes.post("/edit", async (req, res) => {
 
     const body = req.body.data;
 
+    const resourceIds = body.resources.map((res) => {
+      return res._id;
+    });
+
     const update = {
       title: body.title,
       tags: body.tags.toString(),
-      resources: body.resources,
+      resources: resourceIds,
       duration: Number(body.hours) * 60 + Number(body.minutes),
     };
 
     await ServiceModel.findByIdAndUpdate(body.id, update);
     const updatedService = await ServiceModel.findById(body.id);
     console.log(updatedService, "updated service");
+    console.log(resourceIds, "updated resources");
 
     res.json({ data: updatedService });
   } catch (error) {

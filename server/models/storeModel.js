@@ -9,6 +9,43 @@ const StoreSchema = new mongoose.Schema({
   },
   services: [{ type: mongoose.Schema.Types.ObjectId, ref: "Services" }],
   appointments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Appointment" }],
+  availability: {
+    Sun: {
+      available: { type: Boolean },
+      start: { type: String },
+      end: { type: String },
+    },
+    Mon: {
+      available: { type: Boolean },
+      start: { type: String },
+      end: { type: String },
+    },
+    Tues: {
+      available: { type: Boolean },
+      start: { type: String },
+      end: { type: String },
+    },
+    Wed: {
+      available: { type: Boolean },
+      start: { type: String },
+      end: { type: String },
+    },
+    Thur: {
+      available: { type: Boolean },
+      start: { type: String },
+      end: { type: String },
+    },
+    Fri: {
+      available: { type: Boolean },
+      start: { type: String },
+      end: { type: String },
+    },
+    Sat: {
+      available: { type: Boolean },
+      start: { type: String },
+      end: { type: String },
+    },
+  },
 });
 
 const StoreModel = mongoose.model("Active_Stores", StoreSchema);

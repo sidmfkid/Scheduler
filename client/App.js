@@ -124,8 +124,8 @@ const App = () => {
           <MenuAppBar setPageTitle={setPageTitle} getPageTitle={getPageTitle} />
           <Routes>
             <Route path="/home" element={<Dashboard />} />
-            <Route path="/" element={<MyCalendar />} />
-            <Route path="appointments" element={<MyCalendar />} />
+            <Route path="/" element={<Appointment />} />
+            <Route path="appointments" element={<Appointment />} />
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="availability" element={<Availability />} />
             <Route path="plans" element={<Plans />} />

@@ -59,7 +59,7 @@ const ServiceList = (props) => {
   const getAllProducts = props.getAllProducts;
   const imported = props.imported;
   const isFetched = props.isFetched;
-  const { success, error, loading, setSaved, isSaved } = props;
+  const { success, error, loading, setSaved, isSaved, resources } = props;
 
   const handleToggle = (value) => () => {
     const currentIndex = checked.indexOf(value);
@@ -92,6 +92,7 @@ const ServiceList = (props) => {
           secondaryAction={
             <Box sx={{ display: "inline-block", position: "relative" }}>
               <EditProductModal
+                resources={resources}
                 setSaved={setSaved}
                 isSaved={isSaved}
                 imported={imported[i]}

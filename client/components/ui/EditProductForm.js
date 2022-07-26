@@ -71,23 +71,38 @@ function getMinutes(num) {
 }
 
 export default function EditProductForm(props) {
-  const { imported, allTags, setSaved, isSaved } = props;
+  const { imported, allTags, setSaved, isSaved, resources } = props;
   const tags = allTags;
   const importedHours = getHours(imported.duration);
   const importedMinutes = getMinutes(imported.duration);
+
+  const resourcesSelected = resources.map((res) => {
+    const titles = res.services.map((v) => v.title);
+    if (titles.includes(imported.title)) {
+      return res.name;
+    }
+  });
+
   const [values, setValues] = useState({
     id: imported._id,
     hours: importedHours || "",
     minutes: importedMinutes || "",
     title: imported.title,
-    resources: [],
+    resources:
+      typeof resourcesSelected === [undefined] ? [] : resourcesSelected,
     tags: imported.tags.includes("[object Undefined]")
       ? ["Undefined"]
       : [imported.tags],
     details: imported.details,
   });
 
-  console.log(values, "AllValues");
+  const names = resources.map((res) => {
+    return {
+      name: res.name,
+      _id: res._id,
+    };
+  });
+  console.log(values, resourcesSelected, "AllValues");
 
   useEffect(() => {
     if (isSaved) {
@@ -188,13 +203,13 @@ export default function EditProductForm(props) {
             )}
             MenuProps={MenuProps}
           >
-            {names.map((name) => (
+            {names.map((name, i) => (
               <MenuItem
-                key={name}
-                value={name}
-                style={getStyles(name, values.resources, theme)}
+                key={name.name ? name.name : i}
+                value={name._id || i}
+                style={getStyles(name.name || name, values.resources, theme)}
               >
-                {name}
+                {name.name || name}
               </MenuItem>
             ))}
           </Select>

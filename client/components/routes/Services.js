@@ -40,6 +40,7 @@ const Services = (props) => {
   const [isFetched, setFetched] = useState(false);
   const [isSelected, setSelected] = useState(false);
   const [isSaved, setSaved] = useState(false);
+  const [getResources, setResources] = useState([]);
 
   const [checked, setChecked] = useState([]);
 
@@ -48,6 +49,7 @@ const Services = (props) => {
   useEffect(() => {
     if (isFetched === true || isSaved) {
       handleSelectProductsButtonClick();
+      fetchResources();
       console.log("getched producrs");
     }
     if (isSelected) {
@@ -113,6 +115,10 @@ const Services = (props) => {
     setChecked([]);
   }
 
+  function fetchResources() {
+    axios.get("/resources/all").then((res) => setResources(res.data.data));
+  }
+
   const importButtonText = `Import (${checked.length}) product${
     checked.length > 1 ? "s" : ""
   }`;
@@ -173,6 +179,7 @@ const Services = (props) => {
           <Grid item xs={12} sm={12} md={12}>
             <Item sx={{ marginTop: "2rem" }}>
               <ServiceList
+                resources={getResources}
                 loading={loading}
                 succes={success}
                 error={error}

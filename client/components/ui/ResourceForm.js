@@ -50,8 +50,23 @@ function getStyles(name, personName, theme) {
 }
 
 const ResourceForm = (props) => {
-  const { values, setValues, serviceNames, postCreatedResource } = props;
+  const {
+    values,
+    setValues,
+    serviceNames,
+    postCreatedResource,
+    modalType,
+    resources,
+    open,
+  } = props;
   //   const serviceNames = values.services.map((serv) => serv.title);
+
+  useEffect(() => {
+    console.log("effect");
+    return () => {
+      console.log("effect");
+    };
+  }, [modalType]);
 
   const handleChange = (prop) => (event) => {
     const {
@@ -136,130 +151,366 @@ const ResourceForm = (props) => {
     },
   });
 
-  return (
-    <Box component="form" sx={{ width: "calc(30rem + 10vw)" }}>
-      <div style={{ display: "flex", flexWrap: "wrap" }}>
-        <Box sx={{ width: "100%" }}>
-          <Typography variant="h6">Resource Name</Typography>
-        </Box>
-        <TextField
-          label="Name"
-          onChange={handleChange("name")}
-          id="resourceName"
-          defaultValue={values.name}
-          sx={{ m: 1, width: "100%" }}
-        />
-        <Box sx={{ width: "100%" }}>
-          <Typography variant="h6">Contact Info</Typography>
-        </Box>
-        <TextField
-          label="Email"
-          onChange={handleChange("email")}
-          id="outlined-start-adornment"
-          defaultValue={values.email}
-          sx={{ m: 1, width: "auto" }}
-        />
-        <TextField
-          label="Phone Number"
-          onChange={handleChange("phone_number")}
-          id="outlined-start-adornment"
-          defaultValue={values.phone_number}
-          sx={{ m: 1, width: "auto" }}
-        />
-        <Box sx={{ width: "100%" }}>
-          <Typography variant="h6">Resource Settings</Typography>
-        </Box>
-        <FormControl sx={{ m: 1, width: "auto" }}>
+  if (modalType === "create") {
+    console.log(values);
+    return (
+      <Box component="form" sx={{ width: "calc(30rem + 10vw)" }}>
+        <div style={{ display: "flex", flexWrap: "wrap" }}>
+          <Box sx={{ width: "100%" }}>
+            <Typography variant="h6">Resource Name</Typography>
+          </Box>
           <TextField
-            label="Type"
-            onChange={handleChange("resourceType")}
-            id="outlined-start-adornment"
-            defaultValue={values.type}
+            label="Name"
+            onChange={handleChange("name")}
+            id="resourceName"
+            defaultValue={values.name}
+            sx={{ m: 1, width: "100%" }}
           />
-          <FormHelperText>Ex: Room, Staff, Equipment etc</FormHelperText>
-        </FormControl>
+          <Box sx={{ width: "100%" }}>
+            <Typography variant="h6">Contact Info</Typography>
+          </Box>
+          <TextField
+            label="Email"
+            onChange={handleChange("email")}
+            id="outlined-start-adornment"
+            defaultValue={values.email}
+            sx={{ m: 1, width: "auto" }}
+          />
+          <TextField
+            label="Phone Number"
+            onChange={handleChange("phone_number")}
+            id="outlined-start-adornment"
+            defaultValue={values.phone_number}
+            sx={{ m: 1, width: "auto" }}
+          />
+          <Box sx={{ width: "100%" }}>
+            <Typography variant="h6">Resource Settings</Typography>
+          </Box>
+          <FormControl sx={{ m: 1, width: "auto" }}>
+            <TextField
+              label="Type"
+              onChange={handleChange("resourceType")}
+              id="outlined-start-adornment"
+              defaultValue={values.type}
+            />
+            <FormHelperText>Ex: Room, Staff, Equipment etc</FormHelperText>
+          </FormControl>
 
-        <FormControl sx={{ m: 1, width: "100%" }}>
-          <InputLabel id="services">Services</InputLabel>
-          <Select
-            labelId="services"
-            id="services"
-            multiple
-            value={values.services}
-            onChange={handleChange("services")}
-            input={<OutlinedInput id="services" label="services" />}
-            renderValue={(selected) => (
-              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                {selected.map((value) => (
-                  <Chip key={value} label={value} />
-                ))}
-              </Box>
-            )}
-            MenuProps={MenuProps}
-          >
-            {serviceNames.map((name) => (
-              <MenuItem
-                key={name.title}
-                value={name.title}
-                style={getStyles(name.title, values.services, theme)}
-              >
-                {name.title}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableCell>WeekDay</TableCell>
-              <TableCell align="center">Available</TableCell>
-              <TableCell align="center">Start Time</TableCell>
-              <TableCell align="center">End Time</TableCell>
-            </TableHead>
-            <TableBody>
-              {["Sun", "Mon", "Tues", "Wed", "Thur", "Fri", "Sat"].map(
-                (day) => {
-                  return (
-                    <TableRow key={day}>
-                      <TableCell scope="row">{day}</TableCell>
-                      <TableCell align="center">
-                        <Switch
-                          value={values.availability[day].available}
-                          onChange={handleAvailabilityChange(day, "switch")}
-                        />
-                      </TableCell>
-
-                      <TableCell sx={{ maxWidth: "30rem" }} align="center">
-                        <LocalizationProvider dateAdapter={AdapterMoment}>
-                          <TimePicker
-                            label="Basic example"
-                            value={values.availability[day].start}
-                            onChange={handleAvailabilityChange(day, "start")}
-                            renderInput={(params) => <TextField {...params} />}
-                          />
-                        </LocalizationProvider>
-                      </TableCell>
-                      <TableCell sx={{ maxWidth: "30rem" }} align="center">
-                        <LocalizationProvider dateAdapter={AdapterMoment}>
-                          <TimePicker
-                            label="Basic example"
-                            value={values.availability[day].end}
-                            onChange={handleAvailabilityChange(day, "end")}
-                            renderInput={(params) => <TextField {...params} />}
-                          />
-                        </LocalizationProvider>
-                      </TableCell>
-                    </TableRow>
-                  );
-                }
+          <FormControl sx={{ m: 1, width: "100%" }}>
+            <InputLabel id="services">Services</InputLabel>
+            <Select
+              labelId="services"
+              id="services"
+              multiple
+              value={values.services}
+              onChange={handleChange("services")}
+              input={<OutlinedInput id="services" label="services" />}
+              renderValue={(selected) => (
+                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                  {selected.map((value) => (
+                    <Chip key={value} label={value} />
+                  ))}
+                </Box>
               )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </div>
-    </Box>
-  );
+              MenuProps={MenuProps}
+            >
+              {serviceNames.map((name) => (
+                <MenuItem
+                  key={name.title}
+                  value={name.title}
+                  style={getStyles(name.title, values.services, theme)}
+                >
+                  {name.title}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableCell>WeekDay</TableCell>
+                <TableCell align="center">Available</TableCell>
+                <TableCell align="center">Start Time</TableCell>
+                <TableCell align="center">End Time</TableCell>
+              </TableHead>
+              <TableBody>
+                {["Sun", "Mon", "Tues", "Wed", "Thur", "Fri", "Sat"].map(
+                  (day) => {
+                    return (
+                      <TableRow key={day}>
+                        <TableCell scope="row">{day}</TableCell>
+                        <TableCell align="center">
+                          <Switch
+                            value={values.availability[day].available}
+                            checked={values.availability[day].available}
+                            onChange={handleAvailabilityChange(day, "switch")}
+                          />
+                        </TableCell>
+
+                        <TableCell sx={{ maxWidth: "30rem" }} align="center">
+                          <LocalizationProvider dateAdapter={AdapterMoment}>
+                            <TimePicker
+                              label="Basic example"
+                              value={values.availability[day].start}
+                              onChange={handleAvailabilityChange(day, "start")}
+                              renderInput={(params) => (
+                                <TextField {...params} />
+                              )}
+                            />
+                          </LocalizationProvider>
+                        </TableCell>
+                        <TableCell sx={{ maxWidth: "30rem" }} align="center">
+                          <LocalizationProvider dateAdapter={AdapterMoment}>
+                            <TimePicker
+                              label="Basic example"
+                              value={values.availability[day].end}
+                              onChange={handleAvailabilityChange(day, "end")}
+                              renderInput={(params) => (
+                                <TextField {...params} />
+                              )}
+                            />
+                          </LocalizationProvider>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  }
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </div>
+      </Box>
+    );
+  }
+  if (modalType === "edit") {
+    console.log(values.services);
+
+    return (
+      <Box component="form" sx={{ width: "calc(30rem + 10vw)" }}>
+        <div style={{ display: "flex", flexWrap: "wrap" }}>
+          <Box sx={{ width: "100%" }}>
+            <Typography variant="h6">Resource Name</Typography>
+          </Box>
+          <TextField
+            label="Name"
+            onChange={handleChange("name")}
+            id="resourceName"
+            defaultValue={values.name}
+            sx={{ m: 1, width: "100%" }}
+          />
+          <Box sx={{ width: "100%" }}>
+            <Typography variant="h6">Contact Info</Typography>
+          </Box>
+          <TextField
+            label="Email"
+            onChange={handleChange("email")}
+            id="outlined-start-adornment"
+            defaultValue={values.email}
+            sx={{ m: 1, width: "auto" }}
+          />
+          <TextField
+            label="Phone Number"
+            onChange={handleChange("phone_number")}
+            id="outlined-start-adornment"
+            defaultValue={values.phone_number}
+            sx={{ m: 1, width: "auto" }}
+          />
+          <Box sx={{ width: "100%" }}>
+            <Typography variant="h6">Resource Settings</Typography>
+          </Box>
+          <FormControl sx={{ m: 1, width: "auto" }}>
+            <TextField
+              label="Type"
+              onChange={handleChange("resourceType")}
+              id="outlined-start-adornment"
+              defaultValue={values.resourceType}
+            />
+            <FormHelperText>Ex: Room, Staff, Equipment etc</FormHelperText>
+          </FormControl>
+
+          <FormControl sx={{ m: 1, width: "100%" }}>
+            <InputLabel id="services">Services</InputLabel>
+            <Select
+              labelId="services"
+              id="services"
+              multiple
+              value={values.services}
+              onChange={handleChange("services")}
+              input={<OutlinedInput id="services" label="services" />}
+              renderValue={(selected) => (
+                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                  {selected.map((value) => (
+                    <Chip key={value} label={value} />
+                  ))}
+                </Box>
+              )}
+              MenuProps={MenuProps}
+            >
+              {serviceNames.map((name) => (
+                <MenuItem
+                  key={name.title}
+                  value={name.title}
+                  style={getStyles(name.title, values.services, theme)}
+                >
+                  {name.title}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableCell>WeekDay</TableCell>
+                <TableCell align="center">Available</TableCell>
+                <TableCell align="center">Start Time</TableCell>
+                <TableCell align="center">End Time</TableCell>
+              </TableHead>
+              <TableBody>
+                {["Sun", "Mon", "Tues", "Wed", "Thur", "Fri", "Sat"].map(
+                  (day) => {
+                    return (
+                      <TableRow key={day}>
+                        <TableCell scope="row">{day}</TableCell>
+                        <TableCell align="center">
+                          <Switch
+                            value={values.availability[day].available}
+                            checked={values.availability[day].available}
+                            onChange={handleAvailabilityChange(day, "switch")}
+                          />
+                        </TableCell>
+
+                        <TableCell sx={{ maxWidth: "30rem" }} align="center">
+                          <LocalizationProvider dateAdapter={AdapterMoment}>
+                            <TimePicker
+                              label="Basic example"
+                              value={values.availability[day].start}
+                              onChange={handleAvailabilityChange(day, "start")}
+                              renderInput={(params) => (
+                                <TextField {...params} />
+                              )}
+                            />
+                          </LocalizationProvider>
+                        </TableCell>
+                        <TableCell sx={{ maxWidth: "30rem" }} align="center">
+                          <LocalizationProvider dateAdapter={AdapterMoment}>
+                            <TimePicker
+                              label="Basic example"
+                              value={values.availability[day].end}
+                              onChange={handleAvailabilityChange(day, "end")}
+                              renderInput={(params) => (
+                                <TextField {...params} />
+                              )}
+                            />
+                          </LocalizationProvider>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  }
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </div>
+        {/* <div style={{ display: "flex", flexWrap: "wrap" }}>
+          <Box sx={{ width: "100%" }}>
+            <Typography variant="h6">Resource Name</Typography>
+          </Box>
+          <TextField
+            label="Name"
+            onChange={handleChange("name")}
+            id="resourceName"
+            defaultValue={values.name}
+            sx={{ m: 1, width: "100%" }}
+          />
+
+  
+          <FormControl sx={{ m: 1, width: "100%" }}>
+            <InputLabel id="services">Services</InputLabel>
+            <Select
+              labelId="services"
+              id="services"
+              multiple
+              value={values.services}
+              onChange={handleChange("services")}
+              input={<OutlinedInput id="services" label="services" />}
+              renderValue={(selected) => (
+                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                  {selected.map((value) => (
+                    <Chip key={value} label={value} />
+                  ))}
+                </Box>
+              )}
+              MenuProps={MenuProps}
+            >
+              {serviceNames.map((name) => (
+                <MenuItem
+                  key={name.title}
+                  value={name.title}
+                  style={getStyles(name.title, values.services, theme)}
+                >
+                  {name.title}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+  
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableCell>WeekDay</TableCell>
+                <TableCell align="center">Available</TableCell>
+                <TableCell align="center">Start Time</TableCell>
+                <TableCell align="center">End Time</TableCell>
+              </TableHead>
+              <TableBody>
+                {["Sun", "Mon", "Tues", "Wed", "Thur", "Fri", "Sat"].map(
+                  (day) => {
+                    return (
+                      <TableRow key={day}>
+                        <TableCell scope="row">{day}</TableCell>
+                        <TableCell align="center">
+                          <Switch
+                            value={values.availability[day].available}
+                            onChange={handleAvailabilityChange(day, "switch")}
+                          />
+                        </TableCell>
+  
+                        <TableCell sx={{ maxWidth: "30rem" }} align="center">
+                          <LocalizationProvider dateAdapter={AdapterMoment}>
+                            <TimePicker
+                              label="Basic example"
+                              value={values.availability[day].start}
+                              onChange={handleAvailabilityChange(day, "start")}
+                              renderInput={(params) => <TextField {...params} />}
+                            />
+                          </LocalizationProvider>
+                        </TableCell>
+                        <TableCell sx={{ maxWidth: "30rem" }} align="center">
+                          <LocalizationProvider dateAdapter={AdapterMoment}>
+                            <TimePicker
+                              label="Basic example"
+                              value={values.availability[day].end}
+                              onChange={handleAvailabilityChange(day, "end")}
+                              renderInput={(params) => <TextField {...params} />}
+                            />
+                          </LocalizationProvider>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  }
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </div> */}
+      </Box>
+    );
+  }
+  if (modalType === "") {
+    return <div>Nothing</div>;
+  }
 };
 
 export default ResourceForm;

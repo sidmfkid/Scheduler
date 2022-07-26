@@ -236,7 +236,7 @@ export default class MyCalendar extends React.PureComponent {
 
     return (
       <ThemeProvider theme={this.theme}>
-        <Box sx={{ padding: "2rem 4rem" }}>
+        <Box>
           <StyledPaper elevation={8} background="transparent">
             <Scheduler data={data} rootComponent={SchedulerCustom}>
               <ViewState defaultCurrentDate={moment()} />

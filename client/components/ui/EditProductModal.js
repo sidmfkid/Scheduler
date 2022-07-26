@@ -21,7 +21,7 @@ function EditProductModal(props) {
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-  const { imported, allTags, isSaved, setSaved } = props;
+  const { imported, allTags, isSaved, setSaved, resources } = props;
   return (
     <div>
       <Button
@@ -45,6 +45,7 @@ function EditProductModal(props) {
             Edit Product
           </Typography>
           <EditProductForm
+            resources={resources}
             isSaved={isSaved}
             setSaved={setSaved}
             imported={imported}
